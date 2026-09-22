@@ -1,0 +1,2 @@
+# Voting-Simulation
+投票方式による結果の違いと公平性をシミュレーションするPythonプロジェクト
