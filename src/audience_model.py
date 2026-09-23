@@ -18,11 +18,16 @@ def create_audience(bands, num_audience=500, cheating_rate=0.05):
         end_band = random.randint(start_band, num_bands)
 
         # 好きなバンドを決める
-        # 0は特定の好きなバンドがないことを表す
-        favorite_band = random.randint(0, num_bands)
+        # Noneは特定の好きなバンドがないことを表す
+        favorite_band_number = random.randint(0, num_bands)
+
+        if favorite_band_number == 0:
+            favorite_band = None
+        else:
+            favorite_band = bands[favorite_band_number - 1]["name"]
 
         # 実力重視度と好きなバンド補正
-        if favorite_band == 0:
+        if favorite_band is None:
             ability_weight = 100
             favorite_weight = 0
         else:
