@@ -3,7 +3,7 @@ import string
 
 
 def create_bands(num_bands):
-    #指定した数のバンドを、実力順に作成する
+    # 指定した数のバンドを、実力順に作成する
 
     # 実力差のパターンをランダムに決定
     pattern = random.choice([
@@ -13,7 +13,6 @@ def create_bands(num_bands):
         "lower_close",
         "random"
     ])
-    
 
     # 実力値を生成
     if pattern == "high":
@@ -54,13 +53,21 @@ def create_bands(num_bands):
             "ability": ability
         })
 
+    # 演奏順をランダムに決定
+    performance_order = bands.copy()
+    random.shuffle(performance_order)
+
+    # 演奏順を設定
+    for i, band in enumerate(performance_order, start=1):
+        band["performance_order"] = i
+
     return bands, pattern
 
 
 if __name__ == "__main__":
-    bands, pattern = create_bands(5)  #バンド数を入力
-    
-    #パターンの名前
+    bands, pattern = create_bands(5)  # バンド数を入力
+
+    # パターンの名前
     pattern_names = {
         "high": "全バンド実力が高い",
         "low": "全バンド実力が低い",
@@ -71,5 +78,15 @@ if __name__ == "__main__":
 
     print(f"実力パターン: {pattern_names[pattern]}")
 
+    # 実力順
+    print("\n実力順")
     for band in bands:
         print(f"{band['name']}: 実力値 {band['ability']}")
+
+    # 演奏順
+    print("\n演奏順")
+    for band in sorted(bands, key=lambda x: x["performance_order"]):
+        print(
+            f"{band['performance_order']}番目: "
+            f"{band['name']}（実力値 {band['ability']}）"
+        )
