@@ -2,9 +2,12 @@ import random
 import pandas as pd
 
 
-def create_audience(num_audience=500, num_bands=5, cheating_rate=0.05):
+def create_audience(bands, num_audience=500, cheating_rate=0.05):
 
     audience = []
+
+    # バンド数を取得
+    num_bands = len(bands)
 
     for audience_id in range(1, num_audience + 1):
 
@@ -43,9 +46,14 @@ def create_audience(num_audience=500, num_bands=5, cheating_rate=0.05):
 
 
 if __name__ == "__main__":
+
+    from band_model import create_bands
+
+    bands, pattern = create_bands(5)
+
     audience = create_audience(
+        bands=bands,
         num_audience=500,
-        num_bands=5,
         cheating_rate=0.05
     )
 
