@@ -65,8 +65,11 @@ def create_bands(num_bands):
 
 
 if __name__ == "__main__":
-    bands, pattern = create_bands(5)  # バンド数を入力
-
+    # ここで実力パターンを指定
+    bands, pattern = create_bands(
+        num_bands=5,
+        pattern="upper_close"
+    )
     # パターンの名前
     pattern_names = {
         "high": "全バンド実力が高い",
