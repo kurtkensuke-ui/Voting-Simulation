@@ -17,25 +17,57 @@ def create_audience(bands, num_audience=500, cheating_rate=0.05):
         # 何番目のバンドまで見るか
         end_band = random.randint(start_band, num_bands)
 
+
+        # ========================================
         # 好きなバンドを決める
-        # Noneは特定の好きなバンドがないことを表す
-        favorite_band_number = random.randint(0, num_bands)
+        # ========================================
+
+        # 実際に見たバンドだけを候補にする
+        viewed_bands = [
+            band
+            for band in bands
+            if start_band
+            <= band["performance_order"]
+            <= end_band
+        ]
+
+        # 好きなバンドがいない場合もある
+        favorite_band_number = random.randint(
+            0,
+            len(viewed_bands)
+        )
 
         if favorite_band_number == 0:
             favorite_band = None
         else:
-            favorite_band = bands[favorite_band_number - 1]["name"]
+            favorite_band = viewed_bands[
+                favorite_band_number - 1
+            ]["name"]
 
+
+        # ========================================
         # 実力重視度と好きなバンド補正
+        # ========================================
+
         if favorite_band is None:
             ability_weight = 100
             favorite_weight = 0
+
         else:
             ability_weight = random.randint(0, 100)
             favorite_weight = 100 - ability_weight
 
+
+        # ========================================
         # 不正投票を行うか
-        cheating = 1 if random.random() < cheating_rate else 0
+        # ========================================
+
+        cheating = (
+            1
+            if random.random() < cheating_rate
+            else 0
+        )
+
 
         audience.append({
             "観客ID": audience_id,
