@@ -261,7 +261,7 @@ if __name__ == "__main__":
     simulation_count = 1000
     num_bands = 5
     num_audience = 500
-    cheating_rate = 0.05
+    cheating_rate = 0.8
     pattern = "random"
 
     voting_method = vote_full_view
