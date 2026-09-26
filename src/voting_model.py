@@ -8,18 +8,10 @@ def vote_full_view(bands, audience):
 
     最初のバンドから最後のバンドまで
     全バンドを見た観客だけが投票できる。
-
-    通常投票：
-        実力と好みから評価値を計算し、
-        評価値が最も高いバンドに投票する。
-
-    不正投票：
-        評価値を考慮せず、好きなバンドに投票する。
     """
 
     num_bands = len(bands)
 
-    # 最初から最後まで見た観客か確認
     if (
         audience["見始めたバンド"] != 1
         or audience["見終わったバンド"] != num_bands
@@ -32,23 +24,19 @@ def vote_full_view(bands, audience):
 
     scores = []
 
-    # 各バンドの評価値を計算
     for band in bands:
 
-        # 実力による評価
         ability_score = (
             band["ability"]
             * audience["実力重視度"]
             / 100
         )
 
-        # 好きなバンドによる評価
         if band["name"] == audience["好きなバンド"]:
             favorite_score = audience["好きなバンド補正"]
         else:
             favorite_score = 0
 
-        # 総合評価値
         total_score = (
             ability_score
             + favorite_score
@@ -59,24 +47,217 @@ def vote_full_view(bands, audience):
             "score": total_score
         })
 
-    # 最大評価値を取得
     max_score = max(
         item["score"]
         for item in scores
     )
 
-    # 最大評価値のバンドを取得
     candidates = [
         item["name"]
         for item in scores
         if item["score"] == max_score
     ]
 
-    # 同点の場合はランダムに決定
     selected_band = random.choice(candidates)
 
     return selected_band
 
+
+# ========================================
+# 顧問票を加える投票方法
+# ========================================
+
+def vote_with_advisor_top(bands, audience):
+    """
+    投票方法②
+
+    通常の投票に加えて、
+    顧問票10票を実力1位のバンドに加える。
+    """
+
+    return vote_full_view(bands, audience)
+
+
+def vote_with_advisor_distribution(bands, audience):
+    """
+    投票方法③
+
+    通常の投票に加えて、
+    顧問票10票を実力値の割合で各バンドに配分する。
+    """
+
+    return vote_full_view(bands, audience)
+
+
+# ========================================
+# いつでも投票できる方法
+# ========================================
+
+def vote_anytime(bands, audience):
+    """
+    投票方法④
+
+    全員に基本1票の投票権がある。
+
+    通常の観客：
+        自分が見たバンドの中から投票する。
+
+    不正投票：
+        1～5票を持ち、すべて好きなバンドに投票する。
+    """
+
+    # 不正投票
+    if audience["不正投票"] == 1:
+
+        vote_count = random.randint(1, 5)
+
+        return [
+            audience["好きなバンド"]
+            for _ in range(vote_count)
+        ]
+
+    # 通常投票
+    viewed_bands = [
+        band
+        for band in bands
+        if (
+            audience["見始めたバンド"]
+            <= band["performance_order"]
+            <= audience["見終わったバンド"]
+        )
+    ]
+
+    scores = []
+
+    for band in viewed_bands:
+
+        ability_score = (
+            band["ability"]
+            * audience["実力重視度"]
+            / 100
+        )
+
+        if band["name"] == audience["好きなバンド"]:
+            favorite_score = audience["好きなバンド補正"]
+        else:
+            favorite_score = 0
+
+        total_score = (
+            ability_score
+            + favorite_score
+        )
+
+        scores.append({
+            "name": band["name"],
+            "score": total_score
+        })
+
+    max_score = max(
+        item["score"]
+        for item in scores
+    )
+
+    candidates = [
+        item["name"]
+        for item in scores
+        if item["score"] == max_score
+    ]
+
+    selected_band = random.choice(candidates)
+
+    return [selected_band]
+
+
+# ========================================
+# 順位投票
+# ========================================
+
+def vote_rank(bands, audience, apply_min_rank=True):
+    """
+    投票方法⑤⑥
+
+    見たバンドに順位をつける。
+
+    1位 = 最も高い点数
+    2位 = 次に高い点数
+    ・・・
+
+    apply_min_rank=True：
+        見ていないバンドにも最低順位を適用する。
+
+    apply_min_rank=False：
+        見ていないバンドには点数を与えない。
+    """
+
+    viewed_bands = [
+        band
+        for band in bands
+        if (
+            audience["見始めたバンド"]
+            <= band["performance_order"]
+            <= audience["見終わったバンド"]
+        )
+    ]
+
+    scores = {}
+
+    # 見たバンドを実力＋好みで評価
+    band_scores = []
+
+    for band in viewed_bands:
+
+        ability_score = (
+            band["ability"]
+            * audience["実力重視度"]
+            / 100
+        )
+
+        if band["name"] == audience["好きなバンド"]:
+            favorite_score = audience["好きなバンド補正"]
+        else:
+            favorite_score = 0
+
+        total_score = (
+            ability_score
+            + favorite_score
+        )
+
+        band_scores.append({
+            "name": band["name"],
+            "score": total_score
+        })
+
+    # 評価値の高い順に並べる
+    band_scores.sort(
+        key=lambda x: x["score"],
+        reverse=True
+    )
+
+    # 順位を点数に変換
+    for rank, band in enumerate(
+        band_scores,
+        start=1
+    ):
+        scores[band["name"]] = (
+            len(viewed_bands) - rank + 1
+        )
+
+    # 見ていないバンドにも最低順位を与える
+    if apply_min_rank:
+
+        minimum_score = 1
+
+        for band in bands:
+
+            if band["name"] not in scores:
+                scores[band["name"]] = minimum_score
+
+    return scores
+
+
+# ========================================
+# 投票シミュレーション
+# ========================================
 
 def simulate_votes(bands, audience, voting_method):
     """
@@ -93,14 +274,31 @@ def simulate_votes(bands, audience, voting_method):
             person
         )
 
-        results.append({
-            "観客ID": person["観客ID"],
-            "投票権": selected_band is not None,
-            "投票先": selected_band
-        })
+        # 複数票に対応
+        if isinstance(selected_band, list):
+
+            for band_name in selected_band:
+
+                results.append({
+                    "観客ID": person["観客ID"],
+                    "投票権": True,
+                    "投票先": band_name
+                })
+
+        else:
+
+            results.append({
+                "観客ID": person["観客ID"],
+                "投票権": selected_band is not None,
+                "投票先": selected_band
+            })
 
     return pd.DataFrame(results)
 
+
+# ========================================
+# シミュレーション
+# ========================================
 
 def run_simulation(
     simulation_count,
@@ -145,11 +343,7 @@ def run_simulation(
         # 投票率
         # ========================================
 
-        total_votes = (
-            voting_results["投票先"]
-            .notna()
-            .sum()
-        )
+        total_votes = len(voting_results)
 
         voting_rate = (
             total_votes
@@ -173,7 +367,7 @@ def run_simulation(
         )
 
         # ========================================
-        # 実力1位と得票1位の一致
+        # 実力1位と得票1位
         # ========================================
 
         strongest_band = bands[0]["name"]
@@ -188,7 +382,7 @@ def run_simulation(
             top_band_match_count += 1
 
         # ========================================
-        # 実力順位と得票順位の一致率
+        # 実力順位と得票順位
         # ========================================
 
         ability_order = [
