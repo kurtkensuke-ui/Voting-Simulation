@@ -1,78 +1,54 @@
 import pandas as pd
 
 
-def simulate_votes(
+def simulate_rank_votes(
     bands,
     audience,
     voting_method
 ):
     """
-    全観客の投票をシミュレーションする。
+    順位投票をシミュレーションする。
     """
 
     results = []
 
     for _, person in audience.iterrows():
 
-        selected_band = voting_method(
+        scores = voting_method(
             bands,
             person
         )
 
-        # 複数票
-        if isinstance(selected_band, list):
+        for band_name, score in scores.items():
 
-            for band_name in selected_band:
+            if score is not None:
 
                 results.append({
                     "観客ID": person["観客ID"],
                     "投票先": band_name,
-                    "点数": 1
-                })
-
-        # 順位投票
-        elif isinstance(selected_band, dict):
-
-            for band_name, score in selected_band.items():
-
-                if score is not None:
-
-                    results.append({
-                        "観客ID": person["観客ID"],
-                        "投票先": band_name,
-                        "点数": score
-                    })
-
-        # 通常の1票
-        else:
-
-            if selected_band is not None:
-
-                results.append({
-                    "観客ID": person["観客ID"],
-                    "投票先": selected_band,
-                    "点数": 1
+                    "点数": score
                 })
 
     return pd.DataFrame(results)
 
 
-def run_simulation(
+def run_rank_simulation(
     simulation_count,
     num_bands,
     num_audience,
     cheating_rate,
     pattern,
-    voting_method,
-    advisor_mode=None
+    voting_method
 ):
     """
-    通常の投票方法をシミュレーションする。
+    順位投票専用シミュレーション。
+
+    各バンドを実際に見た人の
+    平均点を最終結果とする。
     """
 
     from band_model import create_bands
     from audience_model import create_audience
-    from vote_advisor import add_advisor_votes
 
     total_voting_rate = 0
     top_band_match_count = 0
@@ -80,10 +56,18 @@ def run_simulation(
 
     for _ in range(simulation_count):
 
+        # ========================================
+        # バンド作成
+        # ========================================
+
         bands, _ = create_bands(
             num_bands=num_bands,
             pattern=pattern
         )
+
+        # ========================================
+        # 観客作成
+        # ========================================
 
         audience = create_audience(
             bands=bands,
@@ -91,52 +75,33 @@ def run_simulation(
             cheating_rate=cheating_rate
         )
 
-        voting_results = simulate_votes(
+        # ========================================
+        # 順位投票
+        # ========================================
+
+        voting_results = simulate_rank_votes(
             bands=bands,
             audience=audience,
             voting_method=voting_method
         )
 
+        # ========================================
+        # バンドごとの平均点
+        # ========================================
+
         vote_counts = (
             voting_results
             .groupby("投票先")["点数"]
-            .sum()
+            .mean()
             .reindex(
-                [band["name"] for band in bands],
-                fill_value=0
+                [band["name"] for band in bands]
             )
         )
 
-        # 顧問票
-        if advisor_mode is not None:
-
-            add_advisor_votes(
-                vote_counts,
-                bands,
-                advisor_mode
-            )
-
-        # 投票率
-        if len(voting_results) > 0:
-
-            voting_people = (
-                voting_results["観客ID"]
-                .nunique()
-            )
-
-        else:
-
-            voting_people = 0
-
-        voting_rate = (
-            voting_people
-            / num_audience
-            * 100
-        )
-
-        total_voting_rate += voting_rate
-
+        # ========================================
         # 実力1位と結果1位
+        # ========================================
+
         strongest_band = bands[0]["name"]
 
         highest_score = vote_counts.max()
@@ -148,7 +113,10 @@ def run_simulation(
         if strongest_band in vote_winners:
             top_band_match_count += 1
 
-        # 順位一致率
+        # ========================================
+        # 実力順位と結果順位
+        # ========================================
+
         ability_order = [
             band["name"]
             for band in bands
@@ -167,6 +135,9 @@ def run_simulation(
             ability_order
         ):
 
+            if band_name not in result_order:
+                continue
+
             result_rank = result_order.index(
                 band_name
             )
@@ -182,9 +153,27 @@ def run_simulation(
 
         total_rank_match_rate += rank_match_rate
 
+        # ========================================
+        # 投票率
+        # ========================================
+
+        voting_people = (
+            voting_results["観客ID"]
+            .nunique()
+        )
+
+        voting_rate = (
+            voting_people
+            / num_audience
+            * 100
+        )
+
+        total_voting_rate += voting_rate
+
     return {
         "平均投票率":
-            total_voting_rate / simulation_count,
+            total_voting_rate
+            / simulation_count,
 
         "実力1位＝結果1位率":
             top_band_match_count
