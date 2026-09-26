@@ -13,11 +13,13 @@ from simulation_rank import run_rank_simulation
 # シミュレーション条件
 # ========================================
 
+
 simulation_count = 1000
 num_bands = 5
 num_audience = 500
 cheating_rate = 0.05
 pattern = "random"
+ability_weight=None
 
 
 # ========================================
@@ -56,7 +58,8 @@ if voting_method in rank_methods:
         num_audience=num_audience,
         cheating_rate=cheating_rate,
         pattern=pattern,
-        voting_method=voting_method
+        voting_method=voting_method,
+        ability_weight=ability_weight
     )
 
 else:
@@ -68,7 +71,8 @@ else:
         cheating_rate=cheating_rate,
         pattern=pattern,
         voting_method=voting_method,
-        advisor_mode=advisor_mode
+        advisor_mode=advisor_mode,
+        ability_weight=ability_weight
     )
 
 

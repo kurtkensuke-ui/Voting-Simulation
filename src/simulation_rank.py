@@ -38,7 +38,8 @@ def run_rank_simulation(
     num_audience,
     cheating_rate,
     pattern,
-    voting_method
+    voting_method,
+    ability_weight
 ):
     """
     順位投票専用シミュレーション。
@@ -72,7 +73,8 @@ def run_rank_simulation(
         audience = create_audience(
             bands=bands,
             num_audience=num_audience,
-            cheating_rate=cheating_rate
+            cheating_rate=cheating_rate,
+            ability_weight=ability_weight
         )
 
         # ========================================

@@ -64,7 +64,8 @@ def run_simulation(
     cheating_rate,
     pattern,
     voting_method,
-    advisor_mode=None
+    advisor_mode=None,
+    ability_weight=None
 ):
     """
     通常の投票方法をシミュレーションする。
@@ -89,12 +90,14 @@ def run_simulation(
             bands=bands,
             num_audience=num_audience,
             cheating_rate=cheating_rate
+            
         )
 
         voting_results = simulate_votes(
             bands=bands,
             audience=audience,
-            voting_method=voting_method
+            voting_method=voting_method,
+            ability_weight=ability_weight
         )
 
         vote_counts = (
