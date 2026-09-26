@@ -71,8 +71,8 @@ else:
         cheating_rate=cheating_rate,
         pattern=pattern,
         voting_method=voting_method,
-        advisor_mode=advisor_mode,
-        ability_weight=ability_weight
+        ability_weight=ability_weight,
+        advisor_mode=advisor_mode
     )
 
 

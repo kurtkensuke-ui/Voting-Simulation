@@ -1,59 +1,174 @@
 import random
 
 
-def vote_full_view(bands, audience):
+def vote_full_view(
+    bands,
+    audience
+):
     """
     最初のバンドから最後のバンドまで
-    全バンドを見た観客だけが1票投票する。
+    全バンドを見た観客だけが投票できる方式。
+
+    通常投票：
+        全バンドを見た観客だけが投票する。
+
+    不正投票：
+        全バンドを見ていなくても投票する。
+        ただし、投票先の決定方法は通常投票と同じ。
     """
 
     num_bands = len(bands)
 
-    # 全バンドを見ていない場合
+
+    # ========================================
+    # 投票資格
+    # ========================================
+
+    watched_all = (
+
+        audience["見始めたバンド"] == 1
+
+        and
+
+        audience["見終わったバンド"]
+        == num_bands
+    )
+
+
+    # ========================================
+    # 通常の観客
+    # ========================================
+
     if (
-        audience["見始めたバンド"] != 1
-        or audience["見終わったバンド"] != num_bands
+        not watched_all
+        and
+        audience["不正投票"] == 0
     ):
+
         return None
 
-    # 不正投票
-    if audience["不正投票"] == 1:
-        return audience["好きなバンド"]
+
+    # ========================================
+    # 投票対象
+    # ========================================
+
+    # 不正投票者は全バンドを見ていなくても
+    # 投票できる。
+
+    viewed_bands = [
+
+        band
+
+        for band in bands
+
+        if (
+            audience["見始めたバンド"]
+            <= band["performance_order"]
+            <= audience["見終わったバンド"]
+        )
+    ]
+
+
+    # ========================================
+    # 通常投票・不正投票共通
+    # ========================================
 
     scores = []
 
-    for band in bands:
+
+    for band in viewed_bands:
+
+        # ====================================
+        # 実力による評価
+        # ====================================
 
         ability_score = (
+
             band["ability"]
+
             * audience["実力重視度"]
+
             / 100
         )
 
-        if band["name"] == audience["好きなバンド"]:
-            favorite_score = audience["好きなバンド補正"]
+
+        # ====================================
+        # 好きなバンドによる評価
+        # ====================================
+
+        if (
+            band["name"]
+            ==
+            audience["好きなバンド"]
+        ):
+
+            favorite_score = (
+
+                audience["好きなバンド補正"]
+            )
+
         else:
+
             favorite_score = 0
 
+
+        # ====================================
+        # 合計評価
+        # ====================================
+
         total_score = (
+
             ability_score
+
             + favorite_score
         )
 
+
         scores.append({
-            "name": band["name"],
-            "score": total_score
+
+            "name":
+                band["name"],
+            "score":
+                total_score
         })
 
+
+    # ========================================
+    # 評価対象がない場合
+    # ========================================
+
+    if len(scores) == 0:
+        
+        return None
+
+
+    # ========================================
+    # 最大得点
+    # ========================================
+
     max_score = max(
+
         item["score"]
         for item in scores
     )
 
+
+    # ========================================
+    # 同点候補
+    # ========================================
+
     candidates = [
+
         item["name"]
         for item in scores
         if item["score"] == max_score
     ]
 
-    return random.choice(candidates)
+
+    # ========================================
+    # 投票
+    # ========================================
+
+    return random.choice(
+        candidates
+    )

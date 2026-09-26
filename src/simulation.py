@@ -96,8 +96,7 @@ def run_simulation(
         voting_results = simulate_votes(
             bands=bands,
             audience=audience,
-            voting_method=voting_method,
-            ability_weight=ability_weight
+            voting_method=voting_method
         )
 
         vote_counts = (
