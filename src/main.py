@@ -14,7 +14,7 @@ from simulation_rank import run_rank_simulation
 # ========================================
 
 
-simulation_count = 1000
+simulation_count = 1
 num_bands = 5
 num_audience = 500
 cheating_rate = 0.05
@@ -26,7 +26,7 @@ ability_weight=None
 # 使用する投票方法
 # ========================================
 
-voting_method = vote_full_view
+voting_method = vote_rank_no_min
 
 # 顧問票
 # None
@@ -105,6 +105,9 @@ if advisor_mode == "top":
 
 elif advisor_mode == "distribution":
     print("顧問票：実力比率で10票を配分")
+
+print("\n観客モデル")
+print(results["audience"])
 
 print("\n実力パターン")
 print(pattern)
