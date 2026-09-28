@@ -27,9 +27,7 @@ def vote_full_view(
     watched_all = (
 
         audience["見始めたバンド"] == 1
-
         and
-
         audience["見終わったバンド"]
         == num_bands
     )
@@ -58,7 +56,6 @@ def vote_full_view(
     viewed_bands = [
 
         band
-
         for band in bands
 
         if (
@@ -85,9 +82,7 @@ def vote_full_view(
         ability_score = (
 
             band["ability"]
-
             * audience["実力重視度"]
-
             / 100
         )
 
@@ -103,12 +98,10 @@ def vote_full_view(
         ):
 
             favorite_score = (
-
                 audience["好きなバンド補正"]
             )
 
         else:
-
             favorite_score = 0
 
 
@@ -119,7 +112,6 @@ def vote_full_view(
         total_score = (
 
             ability_score
-
             + favorite_score
         )
 
@@ -138,7 +130,6 @@ def vote_full_view(
     # ========================================
 
     if len(scores) == 0:
-        
         return None
 
 
