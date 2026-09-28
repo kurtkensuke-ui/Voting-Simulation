@@ -258,14 +258,14 @@
 
 
 
-![1位一致率の比較](C:\Users\kurtk\Voting-Simulation\results\シミュレーション結果_投票シミュレーション_AbilityWeight.png)
+[1位一致率の比較](C:\Users\kurtk\Voting-Simulation\results\シミュレーション結果_投票シミュレーション_AbilityWeight.png)
 
 
 #### 順位一致率
 
 
 
-![順位一致率の比較](C:\Users\kurtk\Voting-Simulation\results\シミュレーション結果_投票シミュレーション_AbilityWeight2.png)
+[順位一致率の比較](C:\Users\kurtk\Voting-Simulation\results\シミュレーション結果_投票シミュレーション_AbilityWeight2.png)
 
 
 ## 不正投票の影響
@@ -342,13 +342,13 @@
 #### 1位一致率
 
 
-![不正投票率と1位一致率](results/シミュレーション結果_投票シミュレーション_Cheating.png)
+[不正投票率と1位一致率](results/シミュレーション結果_投票シミュレーション_Cheating.png)
 
 
 #### 順位一致率
 
 
-![不正投票率と順位一致率](C:\Users\kurtk\Voting-Simulation\results\シミュレーション結果_投票シミュレーション_Cheatingw2.png)
+[不正投票率と順位一致率](C:\Users\kurtk\Voting-Simulation\results\シミュレーション結果_投票シミュレーション_Cheatingw2.png)
 
 
 ## 考察
