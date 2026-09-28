@@ -106,8 +106,7 @@ if advisor_mode == "top":
 elif advisor_mode == "distribution":
     print("顧問票：実力比率で10票を配分")
 
-print("\n観客モデル")
-print(results["audience"])
+
 
 print("\n実力パターン")
 print(pattern)
